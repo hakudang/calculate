@@ -13,6 +13,9 @@ const calculate = (btnValue) => {
     display.focus();
     // Nếu btnValue là "=" và output không rỗng
     if (btnValue === "=" && output !== "") {
+        if (specialChars.includes(lastChar)) {
+            return; // Không tính nếu chuỗi kết thúc bằng toán tử
+        }
         // Nếu output có '%', thay thế bằng '/100' trước, sau đó thực thi chuỗi.
         output = eval(output.replace("%", "/100"));
     } else if (btnValue === "AC") {

@@ -55,6 +55,9 @@ const calculate = (btnValue) => {
     display.focus();
     // Nếu btnValue là "=" và output không rỗng
     if (btnValue === "=" && output !== "") {
+        if (specialChars.includes(lastChar)) {
+            return; // Không tính nếu chuỗi kết thúc bằng toán tử
+        }
         // Nếu output có '%', thay thế bằng '/100' trước, sau đó thực thi chuỗi.
         output = eval(output.replace("%", "/100"));
     } else if (btnValue === "AC") {
@@ -95,7 +98,7 @@ flowchart TD
 Start --> C1
 
 C1{btnValue is = AND output not empty}
-C1 -->|Yes| A1[eval] --> End
+C1 -->|Yes| C7
 C1 -->|No| C2
 
 C2{btnValue is AC}
@@ -119,5 +122,10 @@ C5 -->|No| C6
 C6{output is empty AND btnValue in specialChars}
 C6 -->|Yes| End
 C6 -->|No| C4
+
+%% Nhánh xử lý V-16
+C7{lastChar in specialChars}
+C7 -->|Yes| End
+C7 -->|No| A1[evaluate] --> End
 
 ```
