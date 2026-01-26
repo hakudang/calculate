@@ -111,7 +111,7 @@ Scope   : Frontend Input Validation
 | BR-01         | V-01, V-02    |
 | BR-02         | V-09          |
 | BR-03         | V-05, V-06    |
-| BR-04         | V-10, V-11    |
+| BR-04         | V-04, V-10, V-11    |
 | BR-05         | V-15 ～ V-18   |
 | BR-07         | V-19, V-20    |
 | BR-08         | V-21, V-22    |

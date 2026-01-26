@@ -51,7 +51,7 @@ Scope   : All Use Cases
 
 - Ký tự khác → không xử lý
 
-### BR-02：演算子連続入力禁止
+### BR-02：演算子連続入力禁止 - không cho phép nhập toán tử liên tiếp
 
 - Không cho phép nhập 2 toán tử liên tiếp
 
@@ -63,7 +63,7 @@ Scope   : All Use Cases
 - Hệ thống:
   - Bỏ qua toán tử nhập sau
 
-### BR-03：小数点入力制御
+### BR-03：小数点入力制御 - kiểm soát nhập dấu thập phân
 
 - Mỗi số chỉ được chứa 1 dấu `.`
 
@@ -72,14 +72,15 @@ Scope   : All Use Cases
   - ❌ `3.1.5`
   - Dấu `.` thứ 2 → **không xử lý**
 
-### BR-04：先頭演算子制御
+### BR-04：先頭演算子制御 - xử lý toán tử đầu chuỗi
 
 - Không cho phép:
-  - ắt đầu chuỗi bằng `*` hoặc `/`
+  - Bắt đầu chuỗi bằng `*` hoặc `/`
+  - Bắt đầu chuỗi bằng `00` xem như số `0`
 
 - Cho phép:
   - làm số âm (optional v1)
-  - Ví dụ: `-5+3` → hợp lệ
+    - Ví dụ: `-5+3` → hợp lệ
 - Nếu vi phạm → **không xử lý**
 
 ### BR-05：等号入力時の処理
