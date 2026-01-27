@@ -46,7 +46,7 @@ function calculate(btnValue) {
 
         // xử lý nhiều dấu %
         const expr = str.replaceAll("%", "/100");
-        output = eval(expr); // (giữ nguyên cách bạn đang làm)
+        output = String(eval(expr)); // (giữ nguyên cách bạn đang làm)
         display.value = output;
         return;
     }
@@ -92,7 +92,7 @@ function calculate(btnValue) {
 }
 ```
 
-## 2. Mermaid Diggram
+## 2. Mermaid Diagram
 ```mermaid
 flowchart TD
 Start --> C_AC{btnValue is 'AC'}
