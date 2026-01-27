@@ -36,7 +36,7 @@ C3 -->|No| A4[run block_else] --> End
 
 ```
 
-## Validation
+## Validation Diagram
 
 ### Code 01 - JS
 ```js
@@ -52,6 +52,7 @@ buttons.forEach((button) => {
 
 const calculate = (btnValue) => {
     const lastChar = output.toString().slice(-1);
+    const lastNumber = output.toString().split(/[\+\-\*\/\%]/).pop();
     display.focus();
     // Nếu btnValue là "=" và output không rỗng
     if (btnValue === "=" && output !== "") {
@@ -70,6 +71,10 @@ const calculate = (btnValue) => {
         if (output === "" && btnValue === "00") {
             output = "0";
         }
+        // V-07: Xử lý dấu thập phân
+        else if (output === "" && btnValue === ".") {
+            output = "0."; // Tự động thêm 0 trước dấu chấm (V-07)
+        }
         // V-10 & V-11: Xử lý toán tử ở đầu chuỗi
         else if (output === "" && specialChars.includes(btnValue)) {
             if (btnValue === "-") {
@@ -83,6 +88,10 @@ const calculate = (btnValue) => {
         else if (specialChars.includes(btnValue) && specialChars.includes(lastChar)) {
             return; // Không xử lý, giữ nguyên trạng thái (BR-11) [4]
         }
+        // V-05, V-06: Xử lý dấu thập phân
+        else if (lastNumber.includes(".") && btnValue === ".") {
+            return; // Không xử lý nếu số hiện tại đã có dấu chấm
+        }
         // Trường hợp thông thường: Cộng dồn giá trị vào chuỗi
         else {
             output += btnValue;
@@ -91,10 +100,10 @@ const calculate = (btnValue) => {
     display.value = output;
 }
 ```
-### Code 01- sơ đồ mermaid
+### Sơ đồ mermaid
+
 ```mermaid
 flowchart TD
-
 Start --> C1
 
 C1{btnValue is = AND output not empty}
@@ -102,30 +111,37 @@ C1 -->|Yes| C7
 C1 -->|No| C2
 
 C2{btnValue is AC}
-C2 -->|Yes| A2[output -> empty] --> End
+C2 -->|Yes| A2[output -> empty] --> U[update display.value] --> End
 C2 -->|No| C3
 
 C3{btnValue is DEL}
-C3 -->|Yes| A3[delete last character] --> End
+C3 -->|Yes| A3[delete last character] --> U --> End
 C3 -->|No| C5
+
+C5{output is empty AND btnValue is '00'}
+C5 -->|Yes| A5[output -> '0'] --> U --> End
+C5 -->|No| C8
+
+C8{output is empty AND btnValue is '.'}
+C8 -->|Yes| A6[output -> '0.'] --> U --> End
+C8 -->|No| C6
+
+C6{output is empty AND btnValue in specialChars}
+C6 -->|Yes| C6a{btnValue is '-'}
+C6a -->|Yes| A6a[append '-' to output] --> U --> End
+C6a -->|No| End
+C6 -->|No| C4
 
 C4{btnValue in specialChars AND lastChar in specialChars}
 C4 -->|Yes| End
-C4 -->|No| A4[append btnValue to output] --> End
+C4 -->|No| C9
 
-%% Nhánh xử lý V-04
-C5{output is empty AND btnValue is '00'}
-C5 -->|Yes| A5[output -> '0'] --> End
-C5 -->|No| C6
+C9{lastNumber contains '.' AND btnValue is '.'}
+C9 -->|Yes| End
+C9 -->|No| A[append btnValue to output] --> U --> End
 
-%% Nhánh xử lý V-10, V-11
-C6{output is empty AND btnValue in specialChars}
-C6 -->|Yes| End
-C6 -->|No| C4
-
-%% Nhánh xử lý V-16
 C7{lastChar in specialChars}
 C7 -->|Yes| End
-C7 -->|No| A1[evaluate] --> End
+C7 -->|No| A1[evaluate output] --> U --> End
 
 ```

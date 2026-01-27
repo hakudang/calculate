@@ -10,6 +10,7 @@ buttons.forEach((button) => {
 
 const calculate = (btnValue) => {
     const lastChar = output.toString().slice(-1);
+    const lastNumber = output.toString().split(/[\+\-\*\/\%]/).pop();
     display.focus();
     // Nếu btnValue là "=" và output không rỗng
     if (btnValue === "=" && output !== "") {
@@ -28,6 +29,10 @@ const calculate = (btnValue) => {
         if (output === "" && btnValue === "00") {
             output = "0";
         }
+        // V-07: Xử lý dấu thập phân
+        else if (output === "" && btnValue === ".") {
+            output = "0."; // Tự động thêm 0 trước dấu chấm (V-07)
+        }
         // V-10 & V-11: Xử lý toán tử ở đầu chuỗi
         else if (output === "" && specialChars.includes(btnValue)) {
             if (btnValue === "-") {
@@ -40,6 +45,10 @@ const calculate = (btnValue) => {
         // Nếu phím bấm là toán tử VÀ ký tự cuối cùng cũng là toán tử
         else if (specialChars.includes(btnValue) && specialChars.includes(lastChar)) {
             return; // Không xử lý, giữ nguyên trạng thái (BR-11) [4]
+        }
+        // V-05, V-06: Xử lý dấu thập phân
+        else if (lastNumber.includes(".") && btnValue === ".") {
+            return; // Không xử lý nếu số hiện tại đã có dấu chấm
         }
         // Trường hợp thông thường: Cộng dồn giá trị vào chuỗi
         else {
