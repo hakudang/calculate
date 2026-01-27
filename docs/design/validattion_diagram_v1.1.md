@@ -134,4 +134,4 @@ C_DOT2 -->|No| A_APP[output += btnValue] --> U --> End
 | Version | Date       | Description          | Author   |
 | ------- | ---------- | -------------------- | -------- |
 | 1.0     | 2026-01-25 | Initial Release      | BrSE Dang   |
-| 1.1     | 2026-01-27 | separate Commands, Evaluate and validation to improve clarity | BrSE Dang   |
+| 1.1     | 2026-01-27 | Separate Commands, Evaluate and Validation Blocks to improve clarity | BrSE Dang   |
