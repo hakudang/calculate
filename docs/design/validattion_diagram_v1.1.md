@@ -130,3 +130,8 @@ C_DOT2 -->|Yes| End
 C_DOT2 -->|No| A_APP[output += btnValue] --> U --> End
 
 ```
+## 3. 改訂履歴（Revision History）
+| Version | Date       | Description          | Author   |
+| ------- | ---------- | -------------------- | -------- |
+| 1.0     | 2026-01-25 | Initial Release      | BrSE Dang   |
+| 1.1     | 2026-01-27 | separate Commands, Evaluate and validation to improve clarity | BrSE Dang   |
