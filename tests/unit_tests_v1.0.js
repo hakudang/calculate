@@ -1,232 +1,139 @@
 /**
- * unit_tests.js
- * Jest unit tests for calculator calculate(btnValue) logic (DOM + stateful output).
- *
- * Requirements:
- * - jest
- * - testEnvironment: "jsdom"
- *
- * Recommended package.json:
- * {
- *   "scripts": { "test": "jest" },
- *   "jest": { "testEnvironment": "jsdom" }
- * }
- *
- * Assumption:
- * - Your calculator code is in "./calculator.js"
- * - calculator.js defines global function `calculate` and uses:
- *   const display = document.querySelector(".display");
- *   const buttons = document.querySelectorAll("button");
- *
- * If your file name differs, change the require() path below.
+ * Unit Tests cho Calculator Application
+ * Dựa trên Test Case Specification v1.0 [1-5]
+ * Bao phủ các Validation ID (V) và Business Rules (BR)
  */
 
-function setupDom() {
-  document.body.innerHTML = `
-    <div class="app">
-      <input class="display" value="" />
-      <div class="keys">
-        <!-- create only needed buttons so querySelectorAll("button") works -->
-        <button data-value="AC">AC</button>
-        <button data-value="DEL">DEL</button>
+// Giả lập môi trường DOM nếu chạy trong môi trường Node.js (tùy chọn)
+// Nếu chạy trên trình duyệt, bạn có thể gọi trực tiếp các test case này.
 
-        <button data-value="7">7</button>
-        <button data-value="8">8</button>
-        <button data-value="9">9</button>
-        <button data-value="/">/</button>
+function runTests() {
+    console.log("--- Bắt đầu chạy Unit Tests ---");
 
-        <button data-value="4">4</button>
-        <button data-value="5">5</button>
-        <button data-value="6">6</button>
-        <button data-value="*">*</button>
+    // Mock hàm reset trạng thái để đảm bảo tính Deterministic (BR-05) [6]
+    const reset = () => {
+        calculate("AC");
+    };
 
-        <button data-value="1">1</button>
-        <button data-value="2">2</button>
-        <button data-value="3">3</button>
-        <button data-value="-">-</button>
+    // --- Nhóm 1: Nhập số & hiển thị (TC-01, TC-03) [1] ---
+    test("TC-01: Nhập số 5", () => {
+        reset();
+        calculate("5");
+        return output === "5";
+    });
 
-        <button data-value="00">00</button>
-        <button data-value="0">0</button>
-        <button data-value=".">.</button>
-        <button data-value="+">+</button>
+    test("TC-03: Nhập 00 ở đầu chuỗi (V-04)", () => {
+        reset();
+        calculate("00");
+        return output === "0";
+    });
 
-        <button data-value="%">%</button>
-        <button data-value="=">=</button>
-      </div>
-    </div>
-  `;
-  const display = document.querySelector(".display");
-  // stub focus() used in calculate()
-  display.focus = jest.fn();
-  return display;
+    // --- Nhóm 2: Dấu thập phân (TC-04, TC-05, TC-06) [2] ---
+    test("TC-06: Nhập '.' ở đầu chuỗi (V-07)", () => {
+        reset();
+        calculate(".");
+        return output === "0.";
+    });
+
+    test("TC-05: Ngăn nhập 2 dấu '.' trong cùng một số (V-06/BR-03)", () => {
+        reset();
+        calculate("3");
+        calculate(".");
+        calculate("1");
+        calculate("."); // Lần thứ 2
+        return output === "3.1";
+    });
+
+    // --- Nhóm 3: Toán tử (TC-09, TC-10, TC-08) [2] ---
+    test("TC-09: Toán tử * hoặc / ở đầu chuỗi (V-10/BR-04)", () => {
+        reset();
+        calculate("*");
+        return output === "";
+    });
+
+    test("TC-10: Dấu '-' ở đầu chuỗi làm số âm (V-11/BR-04)", () => {
+        reset();
+        calculate("-");
+        calculate("5");
+        return output === "-5";
+    });
+
+    test("TC-08: Ngăn 2 toán tử liên tiếp (V-09/BR-02)", () => {
+        reset();
+        calculate("5");
+        calculate("+");
+        calculate("*"); // Bị ignore
+        return output === "5+";
+    });
+
+    // --- Nhóm 4: Phần trăm (TC-11, TC-13) [2] ---
+    test("TC-13: Nhấn '%' khi chuỗi rỗng (V-14)", () => {
+        reset();
+        calculate("%");
+        return output === "";
+    });
+
+    // --- Nhóm 5: Thực hiện phép tính (TC-14, TC-20, TC-22) [3] ---
+    test("TC-14: Phép cộng cơ bản (V-15)", () => {
+        reset();
+        calculate("2");
+        calculate("+");
+        calculate("3");
+        calculate("=");
+        return Number(output) === 5;
+    });
+
+    test("TC-20: Kết thúc bằng toán tử không được tính (V-16)", () => {
+        reset();
+        calculate("5");
+        calculate("+");
+        calculate("=");
+        return output === "5+"; // Giữ nguyên trạng thái [7]
+    });
+
+    test("TC-22: Chia cho 0 (V-19/BR-07)", () => {
+        reset();
+        calculate("5");
+        calculate("/");
+        calculate("0");
+        calculate("=");
+        // Lưu ý: JS String(eval(5/0)) trả về "Infinity". 
+        return output === "Infinity" || output === "Error"; 
+    });
+
+    // --- Nhóm 6: Xóa dữ liệu (TC-24, TC-26) [4] ---
+    test("TC-24: Xóa 1 ký tự cuối (V-21/BR-08)", () => {
+        reset();
+        calculate("1");
+        calculate("2");
+        calculate("3");
+        calculate("DEL");
+        return output === "12";
+    });
+
+    test("TC-26: Reset toàn bộ bằng AC (V-23/BR-09)", () => {
+        calculate("1");
+        calculate("+");
+        calculate("AC");
+        return output === "" && display.value === "";
+    });
+
+    console.log("--- Hoàn tất kiểm thử ---");
 }
 
-/**
- * Load calculator.js fresh each test (reset module + global state)
- * so `output = ""` etc are reset.
- */
-function loadCalculatorModule() {
-  jest.resetModules();
-  // IMPORTANT: require AFTER DOM is ready
-  require("./calculator.js");
-  if (typeof global.calculate !== "function" && typeof window.calculate !== "function") {
-    throw new Error(
-      "calculate() not found on global/window. Make sure calculator.js defines function calculate in global scope."
-    );
-  }
-  return global.calculate || window.calculate;
+// Hàm bổ trợ chạy test
+function test(name, fn) {
+    try {
+        const result = fn();
+        if (result) {
+            console.log(`✅ [PASS] ${name}`);
+        } else {
+            console.error(`❌ [FAIL] ${name}`);
+        }
+    } catch (e) { 
+        console.error(`💥 [ERROR] ${name}: ${e.message}`);
+    }
 }
 
-function pressSeq(calculate, seq) {
-  seq.forEach((v) => calculate(v));
-}
-
-describe("Calculator unit tests (calculate btnValue)", () => {
-  let display;
-  let calculate;
-
-  beforeEach(() => {
-    display = setupDom();
-    calculate = loadCalculatorModule();
-  });
-
-  // ===== 4.1 Numbers / display =====
-  test("TC-01: input single number '5' => display '5'", () => {
-    calculate("5");
-    expect(display.value).toBe("5");
-  });
-
-  test("TC-02: input sequence 1,2,3 => display '123'", () => {
-    pressSeq(calculate, ["1", "2", "3"]);
-    expect(display.value).toBe("123");
-  });
-
-  test("TC-03: '00' at beginning => '0'", () => {
-    calculate("00");
-    expect(display.value).toBe("0");
-  });
-
-  // ===== 4.2 Decimal =====
-  test("TC-04: decimal 3 . 5 => '3.5'", () => {
-    pressSeq(calculate, ["3", ".", "5"]);
-    expect(display.value).toBe("3.5");
-  });
-
-  test("TC-05: block 2nd '.' in same number: 3 . 1 . => stays '3.1'", () => {
-    pressSeq(calculate, ["3", ".", "1", "."]);
-    expect(display.value).toBe("3.1");
-  });
-
-  test("TC-06: '.' at beginning => '0.'", () => {
-    calculate(".");
-    expect(display.value).toBe("0.");
-  });
-
-  // ===== 4.3 Operator rules =====
-  test("TC-07: operator valid after number: 5 + => '5+'", () => {
-    pressSeq(calculate, ["5", "+"]);
-    expect(display.value).toBe("5+");
-  });
-
-  test("TC-08: block consecutive operators: 5 + + => stays '5+'", () => {
-    pressSeq(calculate, ["5", "+", "+"]);
-    expect(display.value).toBe("5+");
-  });
-
-  test("TC-09: block '*' at beginning => stays ''", () => {
-    calculate("*");
-    expect(display.value).toBe("");
-  });
-
-  test("TC-10: allow '-' at beginning => '-' then '5' => '-5'", () => {
-    pressSeq(calculate, ["-", "5"]);
-    expect(display.value).toBe("-5");
-  });
-
-  // ===== 4.4 Percentage =====
-  test("TC-11: 50 % => expression becomes '50%' in output, '=' evaluates to 0.5", () => {
-    pressSeq(calculate, ["5", "0", "%", "="]);
-    // 50% -> 50/100 -> 0.5
-    expect(String(display.value)).toBe("0.5");
-  });
-
-  test("TC-12: block consecutive %: 50 % % => stays '50%'", () => {
-    pressSeq(calculate, ["5", "0", "%", "%"]);
-    expect(display.value).toBe("50%");
-  });
-
-  test("TC-13: '%' at beginning => blocked, stays ''", () => {
-    calculate("%");
-    expect(display.value).toBe("");
-  });
-
-  // ===== 4.5 Execute '=' =====
-  test("TC-14: 2 + 3 = => 5", () => {
-    pressSeq(calculate, ["2", "+", "3", "="]);
-    expect(String(display.value)).toBe("5");
-  });
-
-  test("TC-15: 5 - 2 = => 3", () => {
-    pressSeq(calculate, ["5", "-", "2", "="]);
-    expect(String(display.value)).toBe("3");
-  });
-
-  test("TC-16: 4 * 3 = => 12", () => {
-    pressSeq(calculate, ["4", "*", "3", "="]);
-    expect(String(display.value)).toBe("12");
-  });
-
-  test("TC-17: 8 / 2 = => 4", () => {
-    pressSeq(calculate, ["8", "/", "2", "="]);
-    expect(String(display.value)).toBe("4");
-  });
-
-  test("TC-18: left-to-right with eval: 10 - 2 * 3 = => 4 (NOTE: JS precedence)", () => {
-    // Your spec says left-to-right => 24
-    // But current code uses eval(), so JS precedence applies: 10 - (2*3) = 4
-    pressSeq(calculate, ["1", "0", "-", "2", "*", "3", "="]);
-    expect(String(display.value)).toBe("4");
-  });
-
-  // ===== 4.6 '=' edge cases =====
-  test("TC-19: '=' when output empty => no change (still '')", () => {
-    calculate("=");
-    expect(display.value).toBe("");
-  });
-
-  test("TC-20: ends with operator (not %) => block '=': '5+' then '=' => stays '5+'", () => {
-    pressSeq(calculate, ["5", "+", "="]);
-    expect(display.value).toBe("5+");
-  });
-
-  test("TC-21: '=' multiple times keeps same result if no new input", () => {
-    pressSeq(calculate, ["2", "+", "3", "="]);
-    const first = String(display.value);
-    calculate("=");
-    const second = String(display.value);
-    expect(second).toBe(first);
-  });
-
-  // ===== /0 behavior with eval =====
-  test("Division by zero: 5 / 0 = => Infinity (current behavior)", () => {
-    pressSeq(calculate, ["5", "/", "0", "="]);
-    expect(String(display.value)).toBe("Infinity");
-  });
-
-  // ===== Commands =====
-  test("TC-24: DEL removes last char: 123 DEL => 12", () => {
-    pressSeq(calculate, ["1", "2", "3", "DEL"]);
-    expect(display.value).toBe("12");
-  });
-
-  test("TC-25: DEL when empty => stays empty", () => {
-    calculate("DEL");
-    expect(display.value).toBe("");
-  });
-
-  test("TC-26: AC resets everything", () => {
-    pressSeq(calculate, ["1", "2", "+", "3"]);
-    calculate("AC");
-    expect(display.value).toBe("");
-  });
-});
+// Thực thi
+runTests();

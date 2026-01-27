@@ -38,7 +38,7 @@ function calculate(btnValue) {
 
         // xử lý nhiều dấu %
         const expr = str.replaceAll("%", "/100");
-        output = eval(expr); // (giữ nguyên cách bạn đang làm)
+        output = String(eval(expr)); // (giữ nguyên cách bạn đang làm)
         display.value = output;
         return;
     }
