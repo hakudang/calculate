@@ -1,6 +1,6 @@
 # Sơ đồ Validation 
 ```text
-version: 1.0
+version: 1.1
 status : Draft → To be Frozen
 ```
 
