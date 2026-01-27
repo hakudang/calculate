@@ -1,5 +1,9 @@
 # Sơ đồ Validation 
-## Cấu trúc điều kiện If - Else If - Else
+```text
+version: 1.0
+status : Draft → To be Frozen
+```
+1. ## Cấu trúc điều kiện If - Else If - Else
 ### Code mẫu
 ```js
     if (điều_kiện_1) {
@@ -36,9 +40,9 @@ C3 -->|No| A4[run block_else] --> End
 
 ```
 
-## Validation Diagram
+2. ## Calculator Application
 
-### Code 01 - JS
+### Code - JS
 ```js
 const display = document.querySelector(".display");
 const buttons = document.querySelectorAll("button");
@@ -100,7 +104,7 @@ const calculate = (btnValue) => {
     display.value = output;
 }
 ```
-### Sơ đồ mermaid
+### Mermaid Diagram
 
 ```mermaid
 flowchart TD
@@ -145,3 +149,7 @@ C7 -->|Yes| End
 C7 -->|No| A1[evaluate output] --> U --> End
 
 ```
+## 3. 改訂履歴（Revision History）
+| Version | Date       | Description          | Author   |
+| ------- | ---------- | -------------------- | -------- |
+| 1.0     | 2026-01-25 | 初版作成             | BrSE Dang     |
