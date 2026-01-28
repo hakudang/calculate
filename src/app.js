@@ -37,9 +37,47 @@ function calculate(btnValue) {
         if (operators.has(lastChar) && lastChar !== "%") return; // chặn kết thúc bằng toán tử
 
         // xử lý nhiều dấu %
-        const expr = str.replaceAll("%", "/100");
-        output = String(eval(expr)); // (giữ nguyên cách bạn đang làm)
-        display.value = output;
+        let expr = str.replaceAll("%", "/100");
+        
+        // BR-06: Tính toán theo thứ tự nhập (left-to-right), không theo BODMAS
+        // BR-07: Xử lý chia cho 0
+        try {
+            // Tách biểu thức thành tokens (số và toán tử)
+            const tokens = expr.match(/\d+\.?\d*|[+\-*/]/g);
+            if (!tokens || tokens.length === 0) {
+                output = "";
+                display.value = output;
+                return;
+            }
+            
+            let result = parseFloat(tokens[0]);
+            
+            // Tính từ trái sang phải
+            for (let i = 1; i < tokens.length; i += 2) {
+                const operator = tokens[i];
+                const operand = parseFloat(tokens[i + 1]);
+                
+                // BR-07: Kiểm tra chia cho 0
+                if (operator === "/" && operand === 0) {
+                    output = "Error";
+                    display.value = output;
+                    return;
+                }
+                
+                switch (operator) {
+                    case "+": result += operand; break;
+                    case "-": result -= operand; break;
+                    case "*": result *= operand; break;
+                    case "/": result /= operand; break;
+                }
+            }
+            
+            output = String(result);
+            display.value = output;
+        } catch (e) {
+            output = "Error";
+            display.value = output;
+        }
         return;
     }
 
