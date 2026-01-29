@@ -44,7 +44,7 @@ Dự án được quản lý chặt chẽ thông qua hệ thống tài liệu c�
 
 ## 8. Tổ chức cây thư mục
 ```text
-/ calculator-app
+/ calculator
   / docs
     / requirements
       - client_requirements_v1.0.md
